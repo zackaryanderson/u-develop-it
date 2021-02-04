@@ -35,27 +35,46 @@ app.get('/', (req, res) => {
 //     console.log(result, this.lastID);
 // });
 
-// // Delete a candidate
-// db.run(`DELETE FROM candidates WHERE id = ?`, 1, function(err, result) {
-//     if (err) {
-//       console.log(err);
-//     }
-//     console.log(result, this, this.changes);
-// });
+//delete a candidate
+app.delete('/api/candidate/:id', (req,res) => {
+    const sql = `DELETE FROM candidates WHERE id = ?`;
+    const params = [req.params.id];
+    db.run(sql,params, function(err, result) {
+        if (err) {
+            res.status(400).json({ error: res.message });
+            return;
+        }
 
-// // GET a single candidate
-// db.get(`SELECT * FROM candidates WHERE id = 1`, (err, row) => {
-//     if(err) {
-//       console.log(err);
-//     }
-//     console.log(row);
-//   });
+        res.json({
+            message: 'successfully deleted',
+            changes: this.changes
+        });
+    });
+});
+
+// GET a single candidate
+app.get('/api/candidate/:id', (req, res) => {
+    const sql = `SELECT * FROM candidates
+                WHERE id = ?`;
+    const params = [req.params.id];
+    db.get(sql, params, (err, row) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+
+        res.json({
+            message: 'success',
+            data: row
+        });
+    });
+});
   
 //get all candidates
 app.get('/api/candidates', (req, res) => {
     const sql = `SELECT * FROM candidates`;
     const params = [];
-    db.all(`SELECT * FROM candidates`, (err, rows) => {
+    db.all(sql, params, (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
